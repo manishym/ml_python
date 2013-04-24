@@ -63,8 +63,8 @@ def plot_cost_theta():
     """
     # using plot: http://matplotlib.org/users/pyplot_tutorial.html
     # matplotlib is the standard plotting library in python. Check tutorial.
-    x = np.matrix([[1, 1, 1], [1, 2, 3]])
-    y = np.matrix([[1, 2, 3]])
+    x = np.matrix([[1, 1], [1, 2], [1, 3]])
+    y = np.matrix([[1], [2], [3]])
     thetas = np.arange(0, 2.1, 0.1)
     average_cost = []
     # The below statement is called list comprehensions. It is same as calling
@@ -72,10 +72,55 @@ def plot_cost_theta():
     # for t in thetas:
     #     average_cost.append(cost(x, y, np.matrix([[0],[t]])))
     average_cost = [cost(x, y, np.matrix([[0], [t]])) for t in thetas]
-    plt.plot(thetas, average_cost)
+    new_theta = gradient_descent(x, y, 0.01)
+    plt.plot(thetas, average_cost, 'r--')  # , thetas, new_theta, 'bs')
     plt.xlabel("Theta")
     plt.ylabel("Cost")
     plt.show()
+
+
+def gradient_descent(x, y, alpha):
+    """This is my attempt at getting gradient descent algorithm working with python.
+    Gradient descent is described in lectures 2.6 and 2.7 of the course.
+    (mat, mat, float) -> mat
+    Writing doctest for gradient_descent() will be difficult, since values returned will
+    be floats and the match will be approximate. So I will write a unittest module for gradient descent.
+    >>> x = np.matrix([[1, 1], [1, 2], [1, 3]])
+    >>> y = np.matrix([[1], [2], [3]])
+    >>> gradient_descent(x, y, 0.01)
+
+
+    Author: Manish M Yathnalli
+    Date:   Tue-23-April-2013
+    """
+    # Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
+    row, col = x.shape
+    theta = np.asmatrix(np.zeros(col)).getT()
+    for i in range(100):
+        theta = improve(x, y, alpha, theta)
+    return theta
+
+def differential_cost(x, y, ):
+    pass
+def improve(x, y, alpha, theta):
+    """ improves the theta using gradient descent formula
+    Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
+    (mat, mat, float, mat) -> mat
+    Doctest not possible.
+    Author: Manish M Yathnalli
+    Date:   Tue-23-April-2013
+    """
+    return theta - (alpha/m) * (differential_cost(x, y, theta))
+    row, col = x.shape
+    print "theta shape", theta.shape
+    assert(theta.shape == (col,1))
+    htheta = (theta.getT() * x.getT()).getT()
+    print "htheta shape: ", htheta.shape
+    diff = htheta - y
+    # return theta
+
+    s = np.asarray(diff).sum()
+    return (theta - alpha/y.size * (np.asarray(x.getT()[1].getT()) * s))
 
 
 if __name__ == '__main__':
