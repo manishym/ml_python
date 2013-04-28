@@ -6,47 +6,105 @@ import numpy as np  # Need to import numpy in order
                     # to use matrix related data and functions
 import matplotlib.pyplot as plt
 
+
 def cost(x, y, theta):
     """This function solves one of the quiz question in the quiz: Linear
     regression with one variable.
-    (mat, mat, mat) -> int
-     >>> cost(np.matrix([[1,1,1,1], [3,2,4,0]]), np.matrix([[4,1,3,1]]), np.matrix([[0],[1]]))
+    (mat, mat, mat) -> float
+     >>> cost(np.matrix([[1,1,1,1], [3,2,4,0]]).getT(), np.matrix([[4,1,3,1]]).getT(), np.matrix([[0],[1]]))
      0.5
-     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]), np.matrix([[1,2,3,4]]), np.matrix([[0],[1]]))
+     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]).getT(), np.matrix([[1,2,3,4]]).getT(), np.matrix([[0],[1]]))
      0.0
-     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]), np.matrix([[1,2,3,4]]), np.matrix([[0],[2]]))
+     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]).getT(), np.matrix([[1,2,3,4]]).getT(), np.matrix([[0],[2]]))
      3.75
-     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]), np.matrix([[1,2,3,4]]), np.matrix([[0],[3]]))
+     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]).getT(), np.matrix([[1,2,3,4]]).getT(), np.matrix([[0],[3]]))
      15.0
-     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]), np.matrix([[1,2,3,4]]), np.matrix([[0],[0.5]]))
+     >>> cost(np.matrix([[1,1,1,1], [1,2,3,4]]).getT(), np.matrix([[1,2,3,4]]).getT(), np.matrix([[0],[0.5]]))
      0.9375
 
      This example is from video lecture 2.3 Cost function.
-     >>> cost(np.matrix([[1,1,1], [1,2,3]]), np.matrix([[1,2,3]]), np.matrix([[0],[1]]))
+     >>> cost(np.matrix([[1,1,1], [1,2,3]]).getT(), np.matrix([[1,2,3]]).getT(), np.matrix([[0],[1]]))
      0.0
-     >>> cost(np.matrix([[1,1,1], [1,2,3]]), np.matrix([[1,2,3]]), np.matrix([[0],[0.5]]))
-     0.58333333333333326
-     >>> cost(np.matrix([[1,1,1], [1,2,3]]), np.matrix([[1,2,3]]), np.matrix([[0],[0]]))
-     2.333333333333333
+     >>> cost(np.matrix([[1,1,1], [1,2,3]]).getT(), np.matrix([[1,2,3]]).getT(), np.matrix([[0],[0.5]]))
+     0.5833333333333334
+     >>> cost(np.matrix([[1,1,1], [1,2,3]]).getT(), np.matrix([[1,2,3]]).getT(), np.matrix([[0],[0]]))
+     2.3333333333333335
 
     Author: Manish M Yathnalli
     Date:   Tue-23-April-2013
     """
     # This is solution for the quiz. Theta will be a column vector of form [theta0; theta1]
     # htheta(x) is theta' * x, which in numpy language theta.getT() * x
-    htheta = theta.getT() * x
+    htheta = x * theta
     # so, difference is theta' * x - y. To exponentiate each element of the matrix, we need to 
-    diff = htheta - y
-    # convert the matrix into array.
-    squared = np.asarray(diff) ** 2
-    # then we need to sum the squared
-    squared.sum()
-    # then multiply it by 1/2m to get answer.
-    jtheta = 1.0/(2 * y.size) * squared.sum()
+    # diff = htheta - y
+    # # convert the matrix into array.
+    # squared = np.asarray(diff) ** 2
+    # # then we need to sum the squared
+    # squared.sum()
+    # # then multiply it by 1/2m to get answer.
+    # jtheta = 1.0/(2 * y.size) * squared.sum()
     # return that
-    return jtheta
+    temp = htheta - y
+    jtheta = temp.getT() * temp / (2.0 * y.size)
+    return float(jtheta)
     # Same can be acomplished in one line using 
     # return 1.0/(2*y.size) * (np.asarray(theta.getT() * x - y)**2).sum()
+
+
+
+
+def gradient_descent(x, y, alpha, iter=500):
+    """This is my attempt at getting gradient descent algorithm working with python.
+    Gradient descent is described in lectures 2.6 and 2.7 of the course.
+    (mat, mat, float) -> mat
+    Writing doctest for gradient_descent() will be difficult, since values returned will
+    be floats and the match will be approximate. So I will write a unittest module for gradient descent.
+    >>> x = np.matrix([[1, 1], [1, 2], [1, 3]])
+    >>> y = np.matrix([[1], [2], [3]])
+    >>> theta = gradient_descent(x, y, 0.01)[0]
+    >>> theta.size == 2
+    True
+
+
+    Author: Manish M Yathnalli
+    Date:   Tue-23-April-2013
+    """
+    # Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
+    #  I was calcluating the sum first then trying to multiply it with x.
+    #  I have to compute the sum after multiplying with x. 
+    #  One iteration of linear regression uses all samples.
+    #  check dairy for more information.
+    row, col = x.shape
+    theta = np.asmatrix(np.zeros(col)).getT()
+    temp = []
+    for i in range(iter):
+        theta = improve(x, y, alpha, theta)
+        temp.append(theta)
+    return theta, temp
+
+
+def improve(x, y, alpha, theta):
+    """ improves the theta using gradient descent formula
+    Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
+    (mat, mat, float, mat) -> mat
+    Doctest not possible.
+    Author: Manish M Yathnalli
+    Date:   Tue-23-April-2013
+    """
+
+    row, col = x.shape
+    # print "theta shape", theta.shape
+    # print "x shape", x.shape
+    # return theta
+    m = float(y.size)
+    assert(theta.shape == (col, 1))
+
+    htheta = (theta.getT() * x.getT()).getT()
+
+    theta = theta - alpha * (((htheta - y).getT() * x).getT() / m)
+    return theta
+
 
 
 def plot_cost_theta():      
@@ -56,10 +114,10 @@ def plot_cost_theta():
     () -> None
     Shows a plot
     >>> plot_cost_theta()
-    None
+    
 
     Author: Manish M Yathnalli
-    Date:   Press [ctrl-alt-d] to insert date
+    Date:   Sun-28-April-2013
     """
     # using plot: http://matplotlib.org/users/pyplot_tutorial.html
     # matplotlib is the standard plotting library in python. Check tutorial.
@@ -72,57 +130,28 @@ def plot_cost_theta():
     # for t in thetas:
     #     average_cost.append(cost(x, y, np.matrix([[0],[t]])))
     average_cost = [cost(x, y, np.matrix([[0], [t]])) for t in thetas]
-    new_theta = gradient_descent(x, y, 0.01)
-    plt.plot(thetas, average_cost, 'r--')  # , thetas, new_theta, 'bs')
+    new_theta, theta_change = gradient_descent(x, y, 0.001, 500)
+    # theta_change gives a list of thetas and how it changed
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(thetas, average_cost, 'r--')  # 
     plt.xlabel("Theta")
     plt.ylabel("Cost")
+    plt.subplot(212)
+    print [t[0] for t in theta_change]
+    # Plots cost vs iteration in blue, theta[0] vs iteration in red and theta[1] vs iteration in yellow.
+    plt.plot(range(500), [cost(x, y, t) for t in theta_change], 'b-', range(500), [float(t[0]) for t in theta_change], 'r-', range(500), [float(t[1]) for t in theta_change], 'y-')
+    plt.xlabel("iteration")
+    plt.ylabel("Cost")
     plt.show()
-
-
-def gradient_descent(x, y, alpha):
-    """This is my attempt at getting gradient descent algorithm working with python.
-    Gradient descent is described in lectures 2.6 and 2.7 of the course.
-    (mat, mat, float) -> mat
-    Writing doctest for gradient_descent() will be difficult, since values returned will
-    be floats and the match will be approximate. So I will write a unittest module for gradient descent.
-    >>> x = np.matrix([[1, 1], [1, 2], [1, 3]])
-    >>> y = np.matrix([[1], [2], [3]])
-    >>> gradient_descent(x, y, 0.01)
-
-
-    Author: Manish M Yathnalli
-    Date:   Tue-23-April-2013
-    """
-    # Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
-    row, col = x.shape
-    theta = np.asmatrix(np.zeros(col)).getT()
-    for i in range(100):
-        theta = improve(x, y, alpha, theta)
-    return theta
-
-def differential_cost(x, y, ):
-    pass
-def improve(x, y, alpha, theta):
-    """ improves the theta using gradient descent formula
-    Gradient descent is defined by improved_theta = alpha/m x(j) sum(t-to-n htheta(x) - y)
-    (mat, mat, float, mat) -> mat
-    Doctest not possible.
-    Author: Manish M Yathnalli
-    Date:   Tue-23-April-2013
-    """
-    return theta - (alpha/m) * (differential_cost(x, y, theta))
-    row, col = x.shape
-    print "theta shape", theta.shape
-    assert(theta.shape == (col,1))
-    htheta = (theta.getT() * x.getT()).getT()
-    print "htheta shape: ", htheta.shape
-    diff = htheta - y
-    # return theta
-
-    s = np.asarray(diff).sum()
-    return (theta - alpha/y.size * (np.asarray(x.getT()[1].getT()) * s))
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+
+# Notes:
+#  I implemented everything in octave first and then ported it to numpy. Since I am new to both octave and python,
+#  I found it easy to implement in octave, since octave's first language is matrix, whereas in python, it is a 
+#  added language.
