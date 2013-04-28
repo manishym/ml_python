@@ -3,6 +3,7 @@
 
 def calculate_features(list, feature):
     """caclulates the said feature
+    This is with reference to 
     (list, index)
     >>> calculate_features([7921, 5184, 8836,4761], 0)
     0.30576687116564416
