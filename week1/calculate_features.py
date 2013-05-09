@@ -19,6 +19,17 @@ def calculate_features(list, feature):
     return ((list[feature] - mean) * 1.0) / diff
 
 
+def f(x, y):
+    """ Add the two inputs. """
+    return x+y
+
+
+def my_function(x, y):
+    """ Add the two inputs. """
+    return x + y
+
+
+
 def main():
     import doctest
     doctest.testmod()
