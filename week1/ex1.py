@@ -10,9 +10,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from demo1 import cost, gradient_descent
 
+
 def add_ones_to(X):
-    j = np.asmatrix(np.ones(X.size)).getT()
+    j = np.asmatrix(np.ones(len(X))).getT()
     return np.append(j, X, 1)
+
 
 def plotData(X, y):
     """This function will plot data as explained in ex1 plotData
@@ -28,6 +30,7 @@ def plotData(X, y):
     plt.ylabel("y")
     plt.show()
 
+
 def main():
     """This function will setup variables and will do the doctest
     Author: Manish M Yathnalli
@@ -36,8 +39,8 @@ def main():
     import doctest
 
     d = scipy.io.loadmat("ex1data1.mat")
-    X = np.asmatrix(d['ex1data1'])[:,0]
-    y =  np.asmatrix(d['ex1data1'])[:,1]
+    X = np.asmatrix(d['ex1data1'])[:, 0]
+    y = np.asmatrix(d['ex1data1'])[:, 1]
     theta = np.matrix([[0], [0]])
     print "Plotting data..."
     iterations = 1500
@@ -46,8 +49,14 @@ def main():
     plotData(X, y)
     X = add_ones_to(X)
     print cost(X, y, theta)
-    theta, hist = gradient_descent(X, y, alpha, iter=iterations) # No need for theta in my gradient descent.
+    theta, hist = gradient_descent(X, y, alpha, iter=iterations)  # No need for theta in my gradient descent.
     print "Theta found by gradient_descent:", theta
+    htheta = theta.getT() * X.getT()
+    plt.plot(X[:, 1], y, 'rx', X[:, 1], htheta.getT())
+    plt.xlabel("Training Data")
+    plt.ylabel("Hypothesis")
+    plt.show()
+    #plotData(y, htheta)
     doctest.testmod()
 
 
